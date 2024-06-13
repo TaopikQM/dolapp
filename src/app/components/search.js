@@ -1,37 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { ref, get } from 'firebase/database';
-import { rtdb } from '../config/firebase';
+import { rtdb } from '../config/firebase'; // Pastikan Anda memiliki konfigurasi Firebase di sini
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from 'react-slick';
-import Link from 'next/link';
+import Link from 'next/link'; // Import Link dari next/link
 
 const SearchResults = () => {
-  const router = useRouter();
-  const { q } = router.query;
-
   const [searchResults, setSearchResults] = useState([]);
   const [data, setData] = useState([]);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const q = searchParams.get('q')?.toLowerCase() || '';
+      setQuery(q);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
-      if (!q) {
-        return; // If q is not defined, exit early
-      }
-
       const placesRef = ref(rtdb, 'tempat_wisata_r');
       const snapshot = await get(placesRef);
 
       if (snapshot.exists()) {
         const places = Object.values(snapshot.val());
+        // Filter tempat wisata berdasarkan status "ACTIVE"
         const activePlaces = places.filter(place => place.status === "ACTIVE");
       
         setData(activePlaces);
 
         const results = activePlaces.filter((item) => {
           const itemString = JSON.stringify(item).toLowerCase();
-          return itemString.includes(q.toLowerCase());
+          return itemString.includes(query);
         });
         setSearchResults(results);
       } else {
@@ -40,9 +42,10 @@ const SearchResults = () => {
         setSearchResults([]);
       }
     }
-
-    fetchData();
-  }, [q]);
+    if (query) {
+      fetchData();
+    }
+  }, [query]);
 
   const settings = {
     dots: true,
@@ -59,7 +62,7 @@ const SearchResults = () => {
     <div className="container mx-auto">
       {searchResults.length > 0 ? (
         <div>
-          <h1 className="text-4xl font-bold mb-6 text-center">Hasil Pencarian untuk: {q}</h1>
+          <h1 className="text-4xl font-bold mb-6 text-center">Hasil Pencarian untuk: {query}</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {searchResults.map((item) => {
               let formattedPrice = null;
