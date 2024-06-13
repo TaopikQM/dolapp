@@ -23,7 +23,6 @@ import AddUlasan from "../components/AddUlasan";
 import UlasanTable from "../components/UlasanTable";
 
 import AddMenuCategory from "../components/AddMenuCategory";
-import UserTable from "../components/UserTable";
 
 import adminMenu from "../components/adminMenu";
 
