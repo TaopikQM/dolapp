@@ -171,7 +171,6 @@ export default Transaksi1;*/}
 import React, { useState } from 'react';
 import { ref,push, set } from "firebase/database";
 import { rtdb } from '../config/firebase';
-import HorizontalTimeline from 'react-horizontal-timeline';
 import TransactionTimeline from './TransactionTimeline'; // Impor komponen TransactionTimeline
 
 
