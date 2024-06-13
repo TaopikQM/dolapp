@@ -70,7 +70,7 @@ const Header = () => {
           </a>
            <a
             href="/admin"
-            className={`px-4 py-2 text-[22px] font-normal ${currentPath === '/admin' ? 'bg-blue-600 text-white rounded' : 'hover:bg-blue-600 hover:text-white hover:rounded'}`}
+            className={`px-4 py-2 text-[22px] font-normal ${currentPath === '#' ? 'bg-blue-600 text-white rounded' : 'hover:bg-blue-600 hover:text-white hover:rounded'}`}
           >
             Promo
           </a>
