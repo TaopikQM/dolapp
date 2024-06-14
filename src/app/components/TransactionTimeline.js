@@ -1,21 +1,37 @@
 import React from 'react';
 
-const TransactionTimeline = ({ steps, activeStepIndex }) => {
+const TransactionTimeline = ({ steps, currentStep }) => {
   return (
     <div className="flex justify-between items-center mb-8">
-      {steps.map((step, index) => (
-        <div key={index} className="flex items-center">
-          {index > 0 && (
-            <div className={`w-16 h-0.5 bg-gray-300 ${index <= activeStepIndex ? 'bg-blue-500' : ''}`}></div>
-          )}
-          <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-gray-300 ${index === activeStepIndex ? 'bg-blue-500 text-white border-blue-500' : ''}`}>
-            {index < activeStepIndex ? <i className="fas fa-check"></i> : index + 1}
-          </div>
-          <div className={`ml-3 text-sm font-medium ${index === activeStepIndex ? 'text-blue-500' : 'text-gray-400'}`}>
-            {step.title}
-          </div>
+      {/* Langkah 1 */}
+      <div className="flex flex-col items-center relative">
+        <div className={`flex justify-center items-center h-12 w-12 rounded-full border-4 ${currentStep >= 0 ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white text-black'}`}>
+          1
         </div>
-      ))}
+        <p className={`${currentStep === 0 ? 'text-blue-500 font-bold' : 'text-gray-500'}`}>{steps[0]}</p>
+      </div>
+
+      {/* Garis horizontal antara langkah 1 dan 2 */}
+      <div className={`flex-1 h-0.5 ${currentStep >= 1 ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+
+      {/* Langkah 2 */}
+      <div className="flex flex-col items-center relative">
+        <div className={`flex justify-center items-center h-12 w-12 rounded-full border-4 ${currentStep >= 1 ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white text-black'}`}>
+          2
+        </div>
+        <p className={`${currentStep === 1 ? 'text-blue-500 font-bold' : 'text-gray-500'}`}>{steps[1]}</p>
+      </div>
+
+      {/* Garis horizontal antara langkah 2 dan 3 */}
+      <div className={`flex-1 h-0.5 ${currentStep >= 2 ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+
+      {/* Langkah 3 */}
+      <div className="flex flex-col items-center relative">
+        <div className={`flex justify-center items-center h-12 w-12 rounded-full border-4 ${currentStep >= 2 ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white text-black'}`}>
+          3
+        </div>
+        <p className={`${currentStep === 2 ? 'text-blue-500 font-bold' : 'text-gray-500'}`}>{steps[2]}</p>
+      </div>
     </div>
   );
 };
