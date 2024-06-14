@@ -81,9 +81,32 @@ const DetailWis = () => {
     document.body.style.overflow = 'auto'; // Enable scroll on the background
   };
 
-
-
   
+  const formatList = (items) => {
+    if (Array.isArray(items) && items.length > 0) {
+      const itemList = items.map((item, index) => `${index + 1}. ${item}`);
+      const columns = [];
+      for (let i = 0; i < itemList.length; i += 5) {
+        columns.push(itemList.slice(i, i + 5));
+      }
+
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {columns.map((column, columnIndex) => (
+            <div key={columnIndex}>
+              {column.map((item, index) => (
+                <div key={index}>{item}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+    } else {
+      return "No Items Available";
+    }
+  };
+
+  const category = placeData.category || '';
 
   return (
     
@@ -152,10 +175,27 @@ const DetailWis = () => {
 
       <div className="px-6 py-0 relative mb-5">
         <div className=" [font-family:'Noto_Sans-SemiBold',Helvetica] font-semibold text-[#213d44] text-[22px] leading-6 px-9 mb-5">Fasilitas</div>
-        <p className="[font-family:'Noto_Sans-Medium',Helvetica] text-justify font-medium text-[#7f7f7f] text-sm leading-normal">
-          {placeData.facilities}
-        </p>
+        {placeData.facilities && placeData.facilities.length > 0 ? (
+          formatList(placeData.facilities)
+        ) : (
+          <p className="text-[#7f7f7f] text-sm leading-normal">
+            Fasilitas tidak ada
+          </p>
+        )}
       </div>
+      {category === 'Taman Rekreasi' && (
+        <div className="px-6 py-0 relative mb-5">
+          <div className="font-semibold text-[#213d44] text-[22px] leading-6 px-9 mb-5">Wahana</div>
+          {Array.isArray(placeData.wahana) && placeData.wahana.length > 0 ? (
+            formatList(placeData.wahana)
+          ) : (
+            <p className="text-[#7f7f7f] text-sm leading-normal">
+              No Wahana Available
+            </p>
+          )}
+        </div>
+      )}
+      
       <div className="tour_head1 tout-map map-container">
         
         <h3 className="  h-[25px] top-0 left-[35px] [font-family:'Noto_Sans-SemiBold',Helvetica] font-semibold text-[#213d44] text-[22px] tracking-[0] leading-[24.2px] whitespace-nowrap">Location</h3>
