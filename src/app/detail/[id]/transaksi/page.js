@@ -28,7 +28,7 @@ export default function Transaksi(){
       <ContainerAw>
         <main className="flex flex-wrap">
         
-          <h1>INi TRANSAKSI</h1>
+         // <h1>INi TRANSAKSI</h1>
             <div className="container mx-auto">
                 <Transaksi1 />
             </div>
