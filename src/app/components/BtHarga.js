@@ -28,10 +28,13 @@ const BtHarga = () => {
     return <div>Loading...</div>;
   }
 
-  const handleClick = () => {
+   const handleClick = () => {
     // Mengarahkan ke halaman transaksi
-    window.location.href = '/transaksi';
-    //<Link href={`/detail/${encodeURIComponent(place.id)}`} key={place.id}></Link>
+     // Mendapatkan ID tempat wisata dari place
+     const id = encodeURIComponent(place.id);
+
+     // Mengarahkan ke halaman transaksi dengan manipulasi URL
+     window.location.href = `/detail/${id}/transaksi`;//<Link href={`/detail/${encodeURIComponent(place.id)}`} key={place.id}></Link>
   };
 
   return (
