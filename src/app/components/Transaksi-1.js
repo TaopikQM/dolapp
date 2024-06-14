@@ -168,11 +168,11 @@ const Transaksi1 = () => {
 };
 
 export default Transaksi1;*/}
-import React, { useState } from 'react';
-import { ref,push, set } from "firebase/database";
+//import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { ref,push, set, onValue  } from "firebase/database";
 import { rtdb } from '../config/firebase';
 import TransactionTimeline from './TransactionTimeline'; // Impor komponen TransactionTimeline
-
 
 const Transaksi1 = () => {
   const [value, setValue] = useState(0);
@@ -186,9 +186,29 @@ const Transaksi1 = () => {
   const [barcode, setBarcode] = useState('');
   const [waktuProses, setWaktuProses] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Tambahkan state isLoading
+  const [isEmailValid, setIsEmailValid] = useState(true); // State tambahan untuk menandai validitas email
 
+  const [nomorRekening, setNomorRekening] = useState('');
+  const [jumlahTransfer, setJumlahTransfer] = useState('');
+  const [totalBiaya, setTotalBiaya] = useState(0);
 
+  const [place, setPlace] = useState(null);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const currentUrl = window.location.href;
+      const id = currentUrl.split('/detail/')[1].split('/')[0];
+
+      const placeRef = ref(rtdb, `tempat_wisata_r/${id}`);
+      onValue(placeRef, (snapshot) => {
+        const data = snapshot.val();
+        //console.log('Data Tempat Wisata:', data);
+        setPlace(data);
+      }, {
+        onlyOnce: true
+      });
+    }
+  }, []);
   
 
   const currentDate = new Date();
@@ -210,7 +230,11 @@ const Transaksi1 = () => {
   };
 
   const handleQuantityChange = (event) => {
-    const newValue = parseInt(event.target.value, 10);
+    let newValue = parseInt(event.target.value, 10);
+    // Limit maximum value to 10
+    if (newValue > 10) {
+      newValue = 10;
+    }
     setQuantity(newValue);
   };
 
@@ -219,11 +243,17 @@ const Transaksi1 = () => {
   };
 
   const handleNomorTeleponChange = (event) => {
-    setNomorTelepon(event.target.value);
+    const value = event.target.value; // Mengubah e.target.value menjadi event.target.value
+    // Menggunakan RegExp untuk hanya membiarkan karakter angka
+   const nomorTeleponFiltered = value.replace(/\D/g, '');
+    setNomorTelepon(nomorTeleponFiltered);
   };
 
   const handleEmailChange = (event) => {
-    setEmail(event.target.value);
+    const value = event.target.value;
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    setEmail(value);
+    setIsEmailValid(isValidEmail || value === ''); // Set state isEmailValid berdasarkan validasi email
   };
 
   const handleMetodePembayaranChange = (event) => {
@@ -231,14 +261,14 @@ const Transaksi1 = () => {
   };
 
   const handleProsesPembayaran = () => {
-    if (metodePembayaran === 'barcode') {
-      setBarcode('Barcode: 1234567890');
-      setWaktuProses('Pembayaran sedang diproses...');
-      setTimeout(() => {
-        setWaktuProses('Pembayaran selesai!');
-        alert('Terima kasih! Tiket akan dikirim ke email Anda.');
-      }, 3000);
-    }
+    // Simulate payment process
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      const generatedBarcode = '1234567890'; // Dummy barcode generation
+      setBarcode(generatedBarcode);
+      setWaktuProses(`Barcode berhasil di-generate pada ${new Date().toLocaleTimeString()}`);
+    }, 2000); // Simulating 2 seconds delay for payment processing
   };
 
   const handleDataSubmission = async () => {
@@ -261,8 +291,11 @@ const Transaksi1 = () => {
         nomorTelepon,
         email,
         metodePembayaran,
-        barcode,
-        waktuProses,
+        barcode: metodePembayaran === 'barcode' ? barcode : '',
+        waktuProses: metodePembayaran === 'barcode' ? waktuProses : '',
+        namaWisata: place?.nama, // Gunakan optional chaining untuk mengakses properti jika place belum terdefinisi
+        idWisata: place?.id, // Gunakan optional chaining untuk mengakses properti jika place belum terdefinisi
+        totalBiaya:calculateTotalBiaya(),
       };
   
       // Simpan data transaksi ke Firebase Realtime Database
@@ -270,6 +303,7 @@ const Transaksi1 = () => {
   
       // Data berhasil disimpan, lakukan tindakan lanjutan di sini, misalnya menampilkan pesan sukses
       console.log("Data transaksi berhasil disimpan:", transactionData);
+      
       // Kosongkan data inputan
       setSelectedDate(null);
       setSelectedTicket('');
@@ -280,8 +314,11 @@ const Transaksi1 = () => {
       setMetodePembayaran('');
       setBarcode('');
       setWaktuProses('');
-          // Data berhasil disimpan, kembali ke langkah pertama
-        setValue(0);
+      setTotalBiaya(0);
+  
+      // Kembali ke langkah pertama
+      setValue(0);
+  
       // Setelah proses selesai, berhenti menampilkan loading spinner
       setIsLoading(false);
     } catch (error) {
@@ -291,129 +328,290 @@ const Transaksi1 = () => {
       setIsLoading(false);
     }
   };
+  
+   // Fungsi untuk menghitung total biaya berdasarkan tiket dan jumlah yang dipilih
+  const calculateTotalBiaya = () => {
+    if (!place) return 0; // Jika tempat wisata belum terpilih, kembalikan 0
+
+    // Ambil harga tiket dari properti price
+    const hargaTiket = place?.price;
+
+    let total = quantity * hargaTiket;
+    return total;
+  };
+
+
+  // Function to check if Step 2 form is valid
+  const isStep2Valid = () => {
+    return nama !== '' && nomorTelepon !== '' && isEmailValid; // Periksa isEmailValid juga di sini
+   };
+
+  // Handle next step button click
+  const handleNextStep = () => {
+    if (value === 1 && !isStep2Valid()) {
+      alert('Silakan lengkapi form Detail Pemesan sebelum melanjutkan.');
+      return;
+    }
+    setValue(value + 1);
+  };
+
   const steps = ['Pilih Tanggal', 'Detail Pemesan', 'Pembayaran'];
+  
+   // Function to render selected data for tourism
+   const renderSelectedData = () => {
+    return (
+      <div className="flex justify-center mb-8">
+        <div className="w-full max-w-md">
+          <h2 className="text-2xl font-bold mb-4">Detail Transaksi</h2>
+          <p>Nama Wisata: {place?.name} {/**  ({place?.id})*/}</p>
+          <p>Tanggal Dipilih: {selectedDate}</p> {/* Menampilkan tanggal yang dipilih */}
+          <p>Nama: {nama}</p>
+          <p>Nomor Telepon: {nomorTelepon}</p>
+          <p>Email: {email}</p>
+          <p>Metode Pembayaran: {metodePembayaran}</p>
+          {metodePembayaran === 'barcode' && (
+            <>
+              <p>Barcode: {barcode}</p>
+              <p>{waktuProses}</p>
+            </>
+          )}
+          {metodePembayaran === 'bank_transfer' && (
+            <>
+              <p>Nomor Rekening: {nomorRekening}</p>
+              <p>Jumlah Transfer: {jumlahTransfer}</p>
+            </>
+          )}
+          <p>Total Biaya: {totalBiaya}</p> {/* Menampilkan total biaya transaksi */}
+        </div>
+      </div>
+    );
+  };
+  
   
   return (
     <div className="container ">
-       <TransactionTimeline steps={steps} /> {/* Tambahkan komponen Timeline di sini */}
-     
+       <TransactionTimeline steps={steps} currentStep={value} /> {/* Tambahkan komponen Timeline di sini */}
+
      
       
-      <br/><br/><br/>
-      {value === 0 && (
-        <div className="mt-9 mb-8">
-          <h2 className="text-2xl font-bold mb-2">Pilih Tanggal</h2>
-          <div className="grid grid-cols-6 gap-4">
-            {dates.map((date, index) => (
+       <div className="mt-8">
+        {/* Step 1: Choose Date */}
+        {value === 0 && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">Pilih Tanggal</h2>
+              <div className="grid grid-cols-7 gap-4">
+                {dates.map((date, index) => (
+                  <button
+                    key={index}
+                    className={`btn ${selectedDate === date.dateStr ? 'btn-active' : 'btn-inactive'}`}
+                    onClick={() => handleDateChange(date.dateStr)}
+                    style={{
+                      backgroundColor: selectedDate === date.dateStr ? '#3182CE' : 'white',
+                      color: selectedDate === date.dateStr ? 'white' : 'black',
+                      border: '1px solid #E5E7EB',
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = '#3182CE';
+                      e.target.style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = selectedDate === date.dateStr ? '#3182CE' : 'white';
+                      e.target.style.color = selectedDate === date.dateStr ? 'white' : 'black';
+                    }}
+                  >
+                    {date.day} <br /> {date.dateStr}
+                  </button>
+                ))}
+            </div>
+            <br/>
+            <div className="mb-4">
+              <label htmlFor="quantityInput">Jumlah Tiket:</label>
+              <input
+                id="quantityInput"
+                type="number"
+                min="1"
+                max="10" // Set maximum number of tickets
+                value={quantity}
+                onChange={handleQuantityChange}
+                className="border rounded-md px-4 py-2"
+              />
+            </div>
+           
+          </div>
+        )}
+
+         {/* Step 2: Customer Details */}
+        {value === 1 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Customer Details</h2>
+            <div className="mt-4">
+              <label className="block font-bold mb-2" htmlFor="nama">
+                Name
+              </label>
+              <input
+                type="text"
+                id="nama"
+                className="block w-full p-2 border border-gray-300 rounded"
+                value={nama}
+                onChange={handleNamaChange}
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block font-bold mb-2" htmlFor="nomorTelepon">
+                Phone Number
+              </label>
+              <input
+                type="text"
+                id="nomorTelepon"
+                className="block w-full p-2 border border-gray-300 rounded"
+                value={nomorTelepon}
+                onChange={handleNomorTeleponChange}
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block font-bold mb-2" htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                className={`block w-full p-2 border border-gray-300 rounded ${isEmailValid ? '' : 'border-red-500'}`}
+                value={email}
+                onChange={handleEmailChange}
+              />
+              {!isEmailValid && (
+                <p className="text-red-500 mt-1">Please enter a valid email address.</p>
+              )}
+            </div>
+           {/**  <div className="mt-8">
               <button
-                key={index}
-                className={`btn ${selectedDate === date.dateStr? 'bg-blue-500 text-white' : 'bg-white text-gray-700'}`}
-                onClick={() => handleDateChange(date.dateStr)}
+                className="px-4 py-2 bg-gray-500 text-white rounded mr-4 hover:bg-gray-600"
+                onClick={() => setValue(value - 1)}
               >
-                {date.day}<br />{date.dateStr}
+                Back
               </button>
-            ))}
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleNextStep}
+              >
+                Next
+              </button>
+            </div>*/}
           </div>
-          <br/>
-          <div className="mb-4">
-          <label htmlFor="quantityInput">Jumlah Tiket:</label>
-          <input
-            id="quantityInput"
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={handleQuantityChange}
-            className="border rounded-md px-4 py-2"
-          />
-          </div>
-        </div>
-      )}
+        )}
 
-      {value === 1 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-2">Detail Pemesan</h2>
-          <div className="mb-4">
-            <label>Nama:</label>
-            <input type="text" value={nama} onChange={handleNamaChange} className="border rounded-md px-4 py-2" />
-          </div>
-          <div className="mb-4">
-            <label>Nomor Telepon:</label>
-            <input type="tel" value={nomorTelepon} onChange={handleNomorTeleponChange} className="border rounded-md px-4 py-2" />
-          </div>
-          <div className="mb-4">
-            <label>Email:</label>
-            <input type="email" value={email} onChange={handleEmailChange} className="border rounded-md px-4 py-2" />
-          </div>
-        </div>
-      )}
+        {/* Step 3: Payment */}
+        {/* Step 3: Payment */}
+{value === 2 && (
+  <div className="mb-8">
+    <h2 className="text-2xl font-bold mb-4">Payment</h2>
 
-      {value === 2 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-2">Pembayaran</h2>
-          <div className="mb-4">
-            <label>Pilih Metode Pembayaran:</label>
-            <select className="border rounded-md px-4 py-2" value={metodePembayaran} onChange={handleMetodePembayaranChange}>
-              <option value="">Pilih Metode Pembayaran</option>
-              <option value="barcode">Barcode</option>
-              <option value="bank_transfer">Transfer Bank</option>
-            </select>
-          </div>
-          {metodePembayaran === 'barcode' && (
-            <div>
-              <div className="mb-4">
-                <label>Barcode:</label>
-                <div className="border rounded-md px-4 py-2">{barcode}</div>
-              </div>
-              <div className="mb-4">
-                <label>Waktu Proses:</label>
-                <div className="border rounded-md px-4 py-2">{waktuProses}</div>
-              </div>
-              <button className="btn btn-primary" onClick={handleProsesPembayaran}>
-                Proses Pembayaran
+    {/* Display Selected Data */}
+    <div className="mt-4">
+      <h3 className="font-bold mb-2">Selected Date:</h3>
+      <p>{selectedDate}</p>
+    </div>
+    <div className="mt-4">
+      <h3 className="font-bold mb-2">Ticket Type:</h3>
+      <p>{selectedTicket}</p>
+    </div>
+    <div className="mt-4">
+      <h3 className="font-bold mb-2">Quantity:</h3>
+      <p>{quantity}</p>
+    </div>
+    <div className="mt-4">
+      <h3 className="font-bold mb-2">Total Price:</h3>
+      <p>{calculateTotalBiaya()} IDR</p>
+    </div>
+
+    <div className="mt-8">
+      <label className="block font-bold mb-2" htmlFor="metodePembayaran">
+        Payment Method
+      </label>
+      <select
+        id="metodePembayaran"
+        className="block w-full p-2 border border-gray-300 rounded"
+        value={metodePembayaran}
+        onChange={handleMetodePembayaranChange}
+      >
+        <option value="">Select Payment Method</option>
+        <option value="barcode">Barcode</option>
+        <option value="bank_transfer">Bank Transfer</option>
+      </select>
+    </div>
+
+    {metodePembayaran === 'barcode' && (
+      <div className="mt-4">
+        {/* Tampilkan Barcode di sini */}
+        <p>Barcode: {barcodeId}</p>
+        <p>Konfirmasi pembayaran dalam 24 jam.</p>
+      </div>
+    )}
+
+    {metodePembayaran === 'bank_transfer' && (
+      <div className="mt-4">
+        <p>Bank Transfer Information:</p>
+        <p>ID Transfer: {bankTransferId}</p>
+        <p>Proses pembayaran berdasarkan informasi yang diberikan.</p>
+      </div>
+    )}
+
+    <div className="mt-8">
+      <button
+        className="px-4 py-2 bg-gray-500 text-white rounded mr-4 hover:bg-gray-600"
+        onClick={() => setValue(value - 1)}
+      >
+        Back
+      </button>
+      <button
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        onClick={() => {
+          if (metodePembayaran === 'barcode') {
+            handleProsesPembayaran();
+          } else {
+            handleDataSubmission();
+          }
+        }}
+      >
+        {isLoading ? 'Processing...' : 'Submit'}
+      </button>
+    </div>
+  </div>
+)}
+
+
+        {/* Display Selected Data */}
+        {value === 3 && (
+          <div className="mb-8">
+            {renderSelectedData()}
+            <div className="mt-8">
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={() => setValue(0)} // Reset to Step 1
+              >
+                New Transaction
               </button>
             </div>
+          </div>
+        )}
+         <div className="flex justify-end">
+          {value > 0 && (
+            <button className="btn btn-secondary mr-4" onClick={() => setValue(value - 1)}>
+              Kembali
+            </button>
           )}
-          {metodePembayaran === 'bank_transfer' && (
-            <div>
-              <div className="mb-4">
-                <label>Nomor Rekening:</label>
-                <input type="text" className="border rounded-md px-4 py-2" />
-              </div>
-              <div className="mb-4">
-                <label>Jumlah Transfer:</label>
-                <input type="text" className="border rounded-md px-4 py-2" />
-              </div>
-              <button className="btn btn-primary">
-                Proses Pembayaran
-              </button>
-            </div>
-          )}
+          {value < 2 && (
+                <button className="btn btn-primary" onClick={handleNextStep}>
+                  Lanjut
+                </button>
+              )}
+          
         </div>
-      )}
-
-      <div className="flex justify-end">
-        {value > 0 && (
-          <button className="btn btn-secondary mr-4" onClick={() => setValue(value - 1)}>
-            Kembali
-          </button>
-        )}
-        {value < 2 && (
-          <button
-            className={`btn ${selectedDate ? 'btn-primary' : 'btn-disabled'}`}
-            onClick={() => selectedDate && setValue(value + 1)}
-            disabled={!selectedDate}
-          >
-            Lanjut
-          </button>
-        )}
-        {value === 2 && (
-          <button className="btn btn-primary" onClick={handleDataSubmission}>
-            Kirim
-          </button>
-        )}
       </div>
     </div>
   );
 };
+
 
 export default Transaksi1;
