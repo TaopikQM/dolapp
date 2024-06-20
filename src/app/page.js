@@ -46,11 +46,11 @@ export default function Home() {
         <RekomReal/>
         
         <WisataBaru/>
-        {/**<TempatBa/>*/} 
+        {/**<TempatBa/>
         <TopCon/>
         <EventCalender events={events} />
         <Event/>
-        <PaketWis />
+        <PaketWis />*/} 
         <TestimonialCarousel />
         
       </ContainerAw>
