@@ -46,6 +46,8 @@ export default function Home() {
         <RekomReal/>
         
         <WisataBaru/>
+        <EventCalender events={events}
+        <Event/>
         {/**<TempatBa/>
         <TopCon/>
         <EventCalender events={events} />
