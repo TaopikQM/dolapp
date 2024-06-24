@@ -3,10 +3,12 @@ import React from 'react'
 
 const page = () => {
     return (
-        <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-            <h3 className='text-center'>Terimakasih telah melakukan pembayaran</h3>
-            <Link href="http://localhost:3000/" className="text-center">Kembali</Link>
-        </div>
+       
+             <div className="bg-green-500 text-white p-4 rounded-lg text-center">
+                  <h1 className="text-2xl font-bold">Terima Kasih!</h1>
+                  <p>Transaksi Anda telah berhasil.</p>
+                  <a href="http://localhost:3000/" className="underline">Kembali ke Beranda</a>
+            </div>
     )
 }
 
