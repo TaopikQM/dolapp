@@ -37,7 +37,7 @@ const ErrorPayment = () => {
                     <h3 className="text-lg font-bold text-center">Pesanan tiket Anda gagal. Transaksi kadaluwarsa.</h3>
                     {placeDetail && (
                         <div className="mt-4">
-                            <p>ID Tiket: orderId</p>
+                            <p>ID Tiket: {placeDetail.id}</p>
                             <p>Nama Tempat: {placeDetail.name}</p>
                         </div>
                     )}
