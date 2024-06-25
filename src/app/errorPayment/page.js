@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useState } from 'react';
 import { ref, get } from 'firebase/database';
 import { rtdb } from '../config/firebase'; // Sesuaikan path jika berbeda
@@ -36,7 +37,7 @@ const ErrorPayment = () => {
                     <h3 className="text-lg font-bold text-center">Pesanan tiket Anda gagal. Transaksi kadaluwarsa.</h3>
                     {placeDetail && (
                         <div className="mt-4">
-                            <p>ID Tiket: {placeDetail.id}</p>
+                            <p>ID Tiket: {orderId}</p>
                             <p>Nama Tempat: {placeDetail.name}</p>
                         </div>
                     )}
