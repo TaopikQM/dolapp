@@ -1,15 +1,67 @@
-import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { ref, get } from 'firebase/database';
+import { rtdb } from '../../config/firebase'; // Sesuaikan path jika berbeda
+import Link from 'next/link';
 
-const page = () => {
+const Page = () => {
+    const [placeDetail, setPlaceDetail] = useState(null);
+    const [transactionStatus, setTransactionStatus] = useState('');
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const orderId = searchParams.get('order_id');
+        const status = searchParams.get('transaction_status');
+        setTransactionStatus(status);
+
+        const placeId = orderId.split('.')[0];
+
+        const fetchPlaceDetail = async (placeId) => {
+            try {
+                const placeRef = ref(rtdb, `tempat_wisata_r/${placeId}`);
+                const snapshot = await get(placeRef);
+                if (snapshot.exists()) {
+                    setPlaceDetail(snapshot.val());
+                } else {
+                    console.log('No such place!');
+                }
+            } catch (error) {
+                console.error('Error fetching place:', error);
+            }
+        };
+
+        fetchPlaceDetail(placeId);
+    }, []);
+
     return (
-       
-             <div className="bg-green-500 text-white p-4 rounded-lg text-center">
-                  <h1 className="text-2xl font-bold">Terima Kasih!</h1>
-                  <p>Transaksi Anda telah berhasil.</p>
-                  <a href="http://localhost:3000/" className="underline">Kembali ke Beranda</a>
-            </div>
-    )
-}
+        <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
+            {transactionStatus === 'pending' ? (
+                <>
+                    <h3 className='text-center'>Pesanan Anda sedang diproses. Detail pesanan tiket:</h3>
+                    {placeDetail && (
+                        <div className='text-center'>
+                            <p>ID Tiket: {placeDetail.id}</p>
+                            <p>Nama Tempat: {placeDetail.name}</p>
+                        </div>
+                    )}
+                    <Link href="http://localhost:3000/" className="text-center">Kembali</Link>
+                </>
+            ) : transactionStatus === 'settlement' ? (
+                <>
+                    <h3 className='text-center'>Terimakasih, transaksi Anda telah berhasil. Detail pesanan tiket:</h3>
+                    {placeDetail && (
+                        <div className='text-center'>
+                            <p>ID Tiket: {placeDetail.id}</p>
+                            <p>Nama Tempat: {placeDetail.name}</p>
+                        </div>
+                    )}
+                    <Link href="http://localhost:3000/" className="text-center">Kembali</Link>
+                </>
+            ) : (
+                <h3 className='text-center'>Status transaksi tidak diketahui.</h3>
+            )}
+        </div>
+    );
+};
 
-export default page
+export default Page;
+
