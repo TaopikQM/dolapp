@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'; 
 import { ref, onValue } from 'firebase/database';
 import { rtdb } from '../config/firebase';
+import Transaksi1 from '..//components/Transaksi-1';
 
 
 
@@ -16,7 +17,7 @@ const BtHarga = () => {
       const placeRef = ref(rtdb, `tempat_wisata_r/${id}`);
       onValue(placeRef, (snapshot) => {
         const data = snapshot.val();
-        console.log('Data Tempat Wisata:', data);
+        //console.log('Data Tempat Wisata:', data);
         setPlace(data);
       }, {
         onlyOnce: true
@@ -28,7 +29,7 @@ const BtHarga = () => {
     return <div>Loading...</div>;
   }
 
-   const handleClick = () => {
+  const handleClick = () => {
     // Mengarahkan ke halaman transaksi
      // Mendapatkan ID tempat wisata dari place
      const id = encodeURIComponent(place.id);
@@ -44,6 +45,7 @@ const BtHarga = () => {
     >
       <h2 className="text-white font-bold">Harga:</h2>
       <p className="text-white">{place.price}</p>
+      
     </div>
   );
 };

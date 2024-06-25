@@ -11,9 +11,7 @@ import ContainerAw from "../components/containerAw";
 
 import Footer from "../components/Footer";
 
-
 import SearchResults from "../components/search";
-
 
 
 const SearchPage = () => {
@@ -24,6 +22,7 @@ const SearchPage = () => {
       <Header />
       <SearchAw />
         <ContainerAw>
+          
           <SearchResults />
         </ContainerAw>
 

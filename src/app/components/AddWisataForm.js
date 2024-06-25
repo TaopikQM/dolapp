@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { storage, rtdb } from '../config/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { ref as databaseRef, push, set, update } from "firebase/database";
+import AddData from './AddData';
+import Map from './Map';
 
 
 const AddWisataForm = () => {
@@ -18,7 +20,14 @@ const AddWisataForm = () => {
   const [openingHours, setOpeningHours] = useState({ open: '', close: '' });
   const [alamat, setAlamat] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Tambahkan state isLoading
+  
+  const [coordinatesInput, setCoordinatesInput] = useState('');
+  const [coordinates, setCoordinates] = useState({ latitude: '', longitude: '' });
 
+ const handleCoordinatesInputChange = (e) => {
+    setCoordinatesInput(e.target.value);
+  };
+  
 
 
   const handleImageChange = (e) => {
@@ -85,19 +94,23 @@ const AddWisataForm = () => {
        
         wilayah,
         status: "ACTIVE",
-        createdAt: currentTime
+        createdAt: currentTime,
+        coordinates: {
+          latitude: coordinatesInput.split(',')[0].trim() || '0',
+          longitude: coordinatesInput.split(',')[1].trim() || '0',
+        },
       };
 
       await set(newWisataRef, initialData);
 
-      console.log("Data saved to Realtime Database with key: ", newWisataKey);
+      //console.log("Data saved to Realtime Database with key: ", newWisataKey);
 
       const imageUrls = await Promise.all(
         images.map(async (image) => {
           const imageRef = storageRef(storage, `tempat_wisata_r/${newWisataKey}/${image.name}`);
           await uploadBytes(imageRef, image);
           const imageUrl = await getDownloadURL(imageRef);
-          console.log(`Uploaded image: ${image.name}, URL: ${imageUrl}`);
+          //console.log(`Uploaded image: ${image.name}, URL: ${imageUrl}`);
           return imageUrl;
         })
       );
@@ -107,7 +120,7 @@ const AddWisataForm = () => {
           const videoRef = storageRef(storage, `tempat_wisata_r/${newWisataKey}/${video.name}`);
           await uploadBytes(videoRef, video);
           const videoUrl = await getDownloadURL(videoRef);
-          console.log(`Uploaded video: ${video.name}, URL: ${videoUrl}`);
+          //console.log(`Uploaded video: ${video.name}, URL: ${videoUrl}`);
           return videoUrl;
         })
       );
@@ -130,21 +143,21 @@ const AddWisataForm = () => {
       setAlamat('');
       setWahana('');
       setInformationTam('');
-      
+      setCoordinatesInput('');
 
       setIsLoading(false); // Selesai upload
       alert("Place added successfully!"); 
-      window.location.reload(); // Refresh the page
+      //window.location.reload(); // Refresh the page
     } catch (error) {
         setIsLoading(false); // Selesai upload dengan kesalahan
-      console.error("Error adding document: ", error);
+     // console.error("Error adding document: ", error);
       alert("Error adding place.");
     }
   };
 
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 p-5">
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
         <input
@@ -152,7 +165,7 @@ const AddWisataForm = () => {
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+          className="mt-1 block h-9 w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
         />
       </div>
       <div>
@@ -183,6 +196,50 @@ const AddWisataForm = () => {
         />
       </div>*/}
       <div>
+        <label htmlFor="wilayah" className="block text-sm font-medium text-gray-700">Wilayah</label>
+        <input
+          type="text"
+          id="wilayah"
+          value={wilayah}
+          onChange={(e) => setwilayah(e.target.value)}
+          className="mt-1 h-9 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+        />
+      </div>
+      <div>
+          <label htmlFor="alamat" className="block text-sm font-medium text-gray-700">Alamat</label>
+          <textarea
+            id="alamat"
+            value={alamat}
+            onChange={(e) => setAlamat(e.target.value)}
+            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+          />
+        </div>
+        {/* AddData component for coordinates */}
+        <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-700">Koordinat Alamat Wisata:</label>
+        <input
+          type="text"
+          value={coordinatesInput}
+          onChange={handleCoordinatesInputChange}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          placeholder="Isi dengan koordinat yang sesuai tempat Wisata. Contoh: -6.221468931701369, 106.5984391068439"
+        />
+      </div>
+
+      {coordinatesInput && (
+        <Map coordinates={coordinatesInput} />
+      )}
+      <div>
+        <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
+        <input
+          type="number"
+          id="price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          className="mt-1 h-9 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+        />
+      </div>
+      <div>
         <label className="block text-sm font-medium text-gray-700">Wahana</label>
         {Array.isArray(wahana) && wahana.map((wahanaItem, index) => (
           <div key={index} className="flex items-center mt-1">
@@ -190,7 +247,7 @@ const AddWisataForm = () => {
               type="text"
               value={wahanaItem}
               onChange={(e) => handleWahanaChange(index, e.target.value)}
-              className="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              className="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md h-9"
             />
             <button
               type="button"
@@ -210,16 +267,7 @@ const AddWisataForm = () => {
         </button>
       </div>
 
-      <div>
-        <label htmlFor="wilayah" className="block text-sm font-medium text-gray-700">Wilayah</label>
-        <input
-          type="text"
-          id="wilayah"
-          value={wilayah}
-          onChange={(e) => setwilayah(e.target.value)}
-          className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-        />
-      </div>
+      
      {/**  <div>
         <label htmlFor="facilities" className="block text-sm font-medium text-gray-700">Facilities</label>
         <input
@@ -238,12 +286,12 @@ const AddWisataForm = () => {
               type="text"
               value={facility}
               onChange={(e) => handleFacilityChange(index, e.target.value)}
-              className="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              className="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md h-9"
             />
             <button
               type="button"
               onClick={() => removeFacility(index)}
-              className="ml-2 px-2 py-1 bg-red-500 text-white rounded-md"
+              className="ml-2 px-2 py-1 bg-red-500 text-white rounded-md "
             >
               Remove
             </button>
@@ -257,16 +305,7 @@ const AddWisataForm = () => {
           Add
         </button>
       </div>
-      <div>
-        <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
-        <input
-          type="number"
-          id="price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-        />
-      </div>
+      
       <div>
         <label className="block text-sm font-medium text-gray-700">Category</label>
         <div className="flex flex-wrap">
@@ -331,15 +370,7 @@ const AddWisataForm = () => {
             </div>
           </div>
         </div>
-        <div>
-          <label htmlFor="alamat" className="block text-sm font-medium text-gray-700">Alamat</label>
-          <textarea
-            id="alamat"
-            value={alamat}
-            onChange={(e) => setAlamat(e.target.value)}
-            className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-          />
-        </div>
+       
         <div>
           <label htmlFor="images" className="block text-sm font-medium text-gray-700">Images</label>
           <input

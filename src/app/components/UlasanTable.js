@@ -84,8 +84,50 @@ const UlasanTable = () => {
     }
   };
 
+  // Pagination logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [storedItemsPerPage, setStoredItemsPerPage] = useState(10); // State tambahan untuk menyimpan pilihan pengguna
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = ulasans.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Handle items per page change
+  const handleItemsPerPageChange = (event) => {
+    const newItemsPerPage = Number(event.target.value);
+    setStoredItemsPerPage(newItemsPerPage); // Simpan pilihan pengguna
+    setItemsPerPage(newItemsPerPage); // Update items per page
+    setCurrentPage(1); // Kembali ke halaman pertama
+  };
+
+  // Total number of items
+  const totalItems = ulasans.length;
+
   return (
     <div className="overflow-x-auto">
+      <div className="flex items-center">
+        <select
+          id="itemsPerPage"
+          value={storedItemsPerPage}
+          onChange={handleItemsPerPageChange}
+          className="border rounded px-2 py-1"
+        >
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={100}>100</option>
+        </select>
+        {/**<label htmlFor="itemsPerPage" className="ml-2">Items per page</label>
+      */}</div>
+      {/* Display total number of items */}
+      <div className="mt-4 text-sm text-gray-500">
+        Total Items: {totalItems}
+      </div>
       <table className="min-w-full bg-white">
         <thead>
           <tr>
@@ -98,7 +140,7 @@ const UlasanTable = () => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {ulasans.map((ulasan) => (
+          {currentItems.map((ulasan) => (
             <tr key={ulasan.id}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <img src={ulasan.foto} alt="Foto Ulasan" className="h-8 w-8 rounded-full" />
@@ -122,6 +164,49 @@ const UlasanTable = () => {
           ))}
         </tbody>
       </table>
+
+      {ulasans.length > itemsPerPage && (
+        <div class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4">
+          <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+            Showing  
+             <span className="font-semibold text-gray-900 dark:text-blue-500"> {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)}-{Math.min(currentPage * itemsPerPage, totalItems)} </span> of  
+            <span className="font-semibold text-gray-900 dark:text-blue-500"> {totalItems}</span>
+          </span>
+          
+          <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 mt-4">
+            <li>
+              {currentPage > 1 && (
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-blue-500 hover:text-white dark:bg-blue-500 dark:border-blue-700 dark:text-white dark:hover:bg-blue-700 dark:hover:text-white"
+                >
+                  Previous
+                </button>
+              )}
+            </li>
+           
+            {[...Array(Math.ceil(ulasans.length / itemsPerPage)).keys()].map((page) => (
+              <button
+                key={page + 1}
+                onClick={() => handlePageChange(page + 1)}
+                className={`px-3 py-1 ${page + 1 === currentPage ? 'bg-white text-blue-500 border border-blue-500' : 'bg-blue-500 text-white'} mx-2`}
+              >
+                {page + 1}
+              </button>
+            ))}
+            <li>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                className={`flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg ${ulasans.length <= currentPage * itemsPerPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-500 hover:text-white dark:bg-blue-500 dark:border-blue-700 dark:text-white dark:hover:bg-blue-700 dark:hover:text-white'}`}
+                disabled={ulasans.length <= currentPage * itemsPerPage}
+              >
+                Next
+              </button>
+            </li>
+          </ul>
+      </div>
+    )}
+
 
       {isEditing && (
         <div className="mt-4">

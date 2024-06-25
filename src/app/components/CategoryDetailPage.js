@@ -35,6 +35,8 @@ const CategoryDetailPage = ({item}) => {
      
         //console.log('Data:', activePlaces);
         setPlaceData(activePlaces);
+        setOriginalPlaceData(activePlaces); // Simpan data awal ke state originalPlaceData
+
 
         // Gabungkan media dari placeData ke combinedMedia
         const combinedMedia = activePlaces.reduce((acc, place) => {
@@ -59,7 +61,23 @@ const CategoryDetailPage = ({item}) => {
    
   };
 
-  
+
+  const [activeRegion, setActiveRegion] = useState('Semua'); // State untuk wilayah aktif
+  const [originalPlaceData, setOriginalPlaceData] = useState([]); // State untuk menyimpan data awal
+
+  // Mengambil daftar wilayah unik dari placeData
+  const regions = [...new Set(placeData.map(item => item.wilayah))];
+
+  const handleRegionFilter = (region) => {
+    if (region === 'Semua') {
+      setActiveRegion('Semua');
+      setPlaceData(originalPlaceData); // Kembalikan ke data awal tanpa filter
+    } else {
+      setActiveRegion(region === activeRegion ? 'Semua' : region);
+      const filteredByRegion = placeData.filter(item => item.wilayah === region);
+      setPlaceData(filteredByRegion);
+    }
+  };
   
 
   return (
@@ -69,6 +87,27 @@ const CategoryDetailPage = ({item}) => {
         <div>
           <h1 className="text-4xl font-bold mb-6 text-center">{category}</h1>
         
+          {/* Tombol Filter Wilayah */}
+          <div className="flex justify-start space-x-4 mb-4 overflow-x-auto">
+            <button
+              className={`px-4 py-2 rounded-lg ${activeRegion === 'Semua' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+              onClick={() => handleRegionFilter('Semua')}
+            >
+              Semua
+            </button>
+            {regions.map((region, index) => (
+              <button
+                key={index}
+                className={`px-4 py-2 rounded-lg ${activeRegion === region ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+                onClick={() => handleRegionFilter(region)}
+              >
+                {region}
+              </button>
+            ))}
+          </div>
+
+          {/* Daftar Tempat Wisata */}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             
             {placeData.map((item) => (

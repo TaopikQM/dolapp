@@ -48,8 +48,8 @@ const AddUlasan = () => {
       alert('Ulasan berhasil ditambahkan!');
       
     } catch (error) {
-      console.error("Error adding ulasan:", error);
-      alert('Terjadi kesalahan saat menambahkan ulasan.');
+      //console.error("Error adding ulasan:", error);
+      //alert('Terjadi kesalahan saat menambahkan ulasan.');
       setIsLoading(false);
     }
   };

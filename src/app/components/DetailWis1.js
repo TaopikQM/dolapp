@@ -15,3 +15,4 @@ const DetailWis1 = () => {
 };
 
 export default DetailWis1;
+

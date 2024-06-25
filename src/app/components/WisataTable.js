@@ -4,10 +4,11 @@ import { rtdb, storage } from '../config/firebase';
 import { getDownloadURL, ref as storageRef, deleteObject, uploadBytes } from 'firebase/storage';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import Link from 'next/link';
 
-import { useHistory } from'react-router-dom';
+import Map from './Map';
 
-const WisataTable = ({ navigateToReviewPage}) => {
+const WisataTable = () => {
   const [places, setPlaces] = useState([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [newData, setNewData] = useState({});
@@ -16,6 +17,10 @@ const WisataTable = ({ navigateToReviewPage}) => {
   const [videoUrls, setVideoUrls] = useState([]);
   const [newFacilities, setNewFacilities] = useState(newData.facilities || []);
   const [newWahana, setNewWahana] = useState(newData.wahana || []);
+ // State untuk menyimpan nilai latitude dan longitude yang digabungkan
+ const [currentCoordinates, setCurrentCoordinates] = useState({ latitude: '', longitude: '' });
+
+ const coordinatesString = `${currentCoordinates.latitude}, ${currentCoordinates.longitude}`;
 
   const handleFacilityChange = (index, value) => {
     const updatedFacilities = [...newFacilities];
@@ -62,6 +67,7 @@ const WisataTable = ({ navigateToReviewPage}) => {
     setNewWahana(newData.wahana || []);
     setImageUrls(newData.imageUrls || []);
     setVideoUrls(newData.videoUrls || []);
+
   }, [newData]);
 
   const toggleStatus = (id, currentStatus) => {
@@ -72,12 +78,12 @@ const WisataTable = ({ navigateToReviewPage}) => {
   {/*const handleReviewButtonClick = (placeId) => {
     setSelectedPlaceId(placeId);
     router.push('/ulasan');
-  };*/}
+  };
   const handleReviewButtonClick = (placeId) => {
     // Panggil fungsi navigasi untuk berpindah ke halaman ulasan
     ///navigateToReviewPage(placeId);
     history.push('/ulasan/{placeId}');
-  };
+  };*/}
 
   const deletePlace = (id) => {
     const placeRef = ref(rtdb, `tempat_wisata_r/${id}`);
@@ -104,7 +110,7 @@ const WisataTable = ({ navigateToReviewPage}) => {
         
         }
       } catch (error) {
-        console.error('Error deleting media:', error);
+        //console.error('Error deleting media:', error);
       }
       
 {/** 
@@ -122,12 +128,26 @@ const WisataTable = ({ navigateToReviewPage}) => {
   const openEditModal = (place) => {
     setNewData(place);
     setSelectedPlaceId(place.id);
+    setCurrentCoordinates({
+      latitude: place.coordinates.latitude,
+      longitude: place.coordinates.longitude
+    });
     setEditModalOpen(true);
   };
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setNewData({ ...newData, [name]: value });
+    if (name === 'coordinates') {
+      setCurrentCoordinates({
+        latitude: value.split(',')[0].trim(),
+        longitude: value.split(',')[1].trim(),
+      });
+    } else {
+      setNewData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -137,7 +157,12 @@ const WisataTable = ({ navigateToReviewPage}) => {
 
   const saveEdit = async () => {
     const placeRef = ref(rtdb, `tempat_wisata_r/${selectedPlaceId}`);
-    const updates = { ...newData };
+    
+    const updates = { ...newData, coordinates: {
+      latitude: currentCoordinates.latitude || '0',
+      longitude: currentCoordinates.longitude || '0',
+    },};
+    
     if (newData.images) {
       const imageUrls = await Promise.all(
         Array.from(newData.images).map(async (image) => {
@@ -167,12 +192,53 @@ const WisataTable = ({ navigateToReviewPage}) => {
     setEditModalOpen(false);
   };
 
+   // Pagination logic
+   const [currentPage, setCurrentPage] = useState(1);
+   const [itemsPerPage, setItemsPerPage] = useState(10);
+   const [storedItemsPerPage, setStoredItemsPerPage] = useState(10); // State tambahan untuk menyimpan pilihan pengguna
+ 
+   const indexOfLastItem = currentPage * itemsPerPage;
+   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+   const currentItems = places.slice(indexOfFirstItem, indexOfLastItem);
+ 
+   const handlePageChange = (pageNumber) => {
+     setCurrentPage(pageNumber);
+   };
+ 
+   // Handle items per page change
+   const handleItemsPerPageChange = (event) => {
+     const newItemsPerPage = Number(event.target.value);
+     setStoredItemsPerPage(newItemsPerPage); // Simpan pilihan pengguna
+     setItemsPerPage(newItemsPerPage); // Update items per page
+     setCurrentPage(1); // Kembali ke halaman pertama
+   };
+
+   // Total number of items
+  const totalItems = places.length;
+
   return (
     <div className="overflow-x-auto">
+      <div className="flex items-center">
+        <select
+          id="itemsPerPage"
+          value={storedItemsPerPage}
+          onChange={handleItemsPerPageChange}
+          className="border rounded px-2 py-1"
+        >
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={100}>100</option>
+        </select>
+       {/**  <label htmlFor="itemsPerPage" className="ml-2">Items per page</label>*/}
+      </div>
+      {/* Display total number of items */}
+      <div className="mt-4 text-sm text-gray-500">
+        Total Items: {totalItems}
+      </div>
       <table className="min-w-full bg-white">
         <thead>
           <tr>
-            <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Select</th>
             <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Media</th>
             <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
             <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
@@ -182,11 +248,8 @@ const WisataTable = ({ navigateToReviewPage}) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {places.map((place) => (
+          {currentItems.map((place) => (
             <tr key={place.id}>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <input type="checkbox" className="form-checkbox" />
-              </td>
               <td className="px-6 py-4 whitespace-nowrap max-w-xs">
               <div>
               <Carousel showThumbs={false} infiniteLoop useKeyboardArrows>
@@ -241,6 +304,15 @@ const WisataTable = ({ navigateToReviewPage}) => {
               </td>
               <td className="px-6 py-4 whitespace-normal max-w-xs">
                 <div className="text-sm text-gray-500">{place.description}</div>
+                <div className="text-sm text-red-600">Maps = {place.coordinates ? (
+                  <p>
+                    {Number.isFinite(parseFloat(place.coordinates.latitude)) ? parseFloat(place.coordinates.latitude) : '0'} ,<br />
+                    {Number.isFinite(parseFloat(place.coordinates.longitude)) ? parseFloat(place.coordinates.longitude) : '0'}
+                  </p>
+                ) : (
+                  <p>Data koordinat tidak tersedia</p>
+                )}
+                </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {place.price}
@@ -254,14 +326,76 @@ const WisataTable = ({ navigateToReviewPage}) => {
                 </button>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                 <button onClick={() => handleReviewButtonClick(place.id)} className="text-green-600 hover:text-green-600">Review</button>
-                <button onClick={() => openEditModal(place)} className="text-indigo-600 hover:text-indigo-900 ml-4">Edit</button>
-                <button onClick={() => deletePlace(place.id)} className="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                {/* Container untuk baris pertama (Review) */}
+                <div className="flex justify-center">
+                  <Link href={`/detail/${encodeURIComponent(place.id)}`} key={place.id}>
+                    <div className="text-green-600 hover:text-green-600 cursor-pointer">
+                      Review
+                    </div>
+                  </Link>
+                </div>
+
+                {/* Baris Kedua */}
+                <div className="flex flex-row items-center">
+                  {/* Kolom Pertama di Baris Kedua */}
+                  <button onClick={() => openEditModal(place)} className="text-indigo-600 hover:text-indigo-900 mr-2">
+                    Edit
+                  </button>
+
+                  {/* Kolom Kedua di Baris Kedua */}
+                  <button onClick={() => deletePlace(place.id)} className="text-red-600 hover:text-red-900">
+                    Delete
+                  </button>
+                </div>
               </td>
+
             </tr>
           ))}
         </tbody>
       </table>
+
+     {places.length > itemsPerPage && (
+        <div className="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4">
+          <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+            Showing  
+            <span className="font-semibold text-gray-900 dark:text-blue-500"> {Math.min((currentPage - 1) * itemsPerPage + 1, places.length)}-{Math.min(currentPage * itemsPerPage, places.length)} </span> of  
+            <span className="font-semibold text-gray-900 dark:text-blue-500"> {places.length}</span>
+          </span>
+          
+          <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8 mt-4">
+            <li>
+              {currentPage > 1 && (
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-blue-500 hover:text-white dark:bg-blue-500 dark:border-blue-700 dark:text-white dark:hover:bg-blue-700 dark:hover:text-white"
+                >
+                  Previous
+                </button>
+              )}
+            </li>
+           
+            {[...Array(Math.ceil(places.length / itemsPerPage)).keys()].map((page) => (
+              <button
+                key={page + 1}
+                onClick={() => handlePageChange(page + 1)}
+                className={`px-3 py-1 ${page + 1 === currentPage ? 'bg-white text-blue-500 border border-blue-500' : 'bg-blue-500 text-white'} mx-2`}
+              >
+                {page + 1}
+              </button>
+            ))}
+            <li>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                className={`flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg ${places.length <= currentPage * itemsPerPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-500 hover:text-white dark:bg-blue-500 dark:border-blue-700 dark:text-white dark:hover:bg-blue-700 dark:hover:text-white'}`}
+                disabled={places.length <= currentPage * itemsPerPage}
+              >
+                Next
+              </button>
+            </li>
+          </ul>
+        </div>
+      )}
+
 
       {editModalOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
@@ -285,6 +419,34 @@ const WisataTable = ({ navigateToReviewPage}) => {
                       <label htmlFor="informationTam" className="block text-sm font-medium text-gray-700">Informasi Tambahan</label>
                       <input type="text" id="informationTam" name="informationTam" value={newData.informationTam || ''} onChange={handleEditChange} placeholder="Enter informasi tambahan" className="mb-2 border p-2 rounded w-full" />
                       
+                      <label htmlFor="alamat" className="block text-sm font-medium text-gray-700">Alamat</label>
+                      <input type="text" id="alamat" name="alamat" value={newData.alamat || ''} onChange={handleEditChange} placeholder="Enter alamat" className="mb-2 border p-2 rounded w-full" />
+                      
+                      <label htmlFor="wilayah" className="block text-sm font-medium text-gray-700">Wilayah</label>
+                      <input type="text" id="wilayah" name="wilayah" value={newData.wilayah || ''} onChange={handleEditChange} placeholder="Enter wilayah" className="mb-2 border p-2 rounded w-full" />
+                    
+                      <div className="mb-2">
+                        <label className="block text-sm font-medium text-gray-700">Koordinat Alamat Wisata:</label>
+                        <input
+                          type="text"
+                          id="coordinates"
+                          name="coordinates"
+                          value={coordinatesString}
+                          onChange={handleEditChange}
+                          placeholder="Latitude, Longitude"
+                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        />
+                      </div>
+
+                      {coordinatesString && (
+                        <Map coordinates={coordinatesString} />
+                      )}
+
+                      <br/><br/>
+
+                      <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
+                      <input type="text" id="price" name="price" value={newData.price || ''} onChange={handleEditChange} placeholder="Enter price" className="mb-2 border p-2 rounded w-full" />
+                      
                       <label className="block text-sm font-medium text-gray-700">Wahana</label>
                         {newWahana.map((wahanaItem, index) => (
                           <div key={index} className="flex items-center mt-1">
@@ -292,7 +454,7 @@ const WisataTable = ({ navigateToReviewPage}) => {
                               type="text"
                               value={wahanaItem}
                               onChange={(e) => handleWahanaChange(index, e.target.value)}
-                              className="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                              className=" mb-2 border p-2   block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                             />
                             <button
                               type="button"
@@ -306,14 +468,12 @@ const WisataTable = ({ navigateToReviewPage}) => {
                         <button
                           type="button"
                           onClick={addWahana}
-                          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+                          className="mb-5 mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
                         >
                           Add
                         </button>
 
-                      <label htmlFor="wilayah" className="block text-sm font-medium text-gray-700">Wilayah</label>
-                      <input type="text" id="wilayah" name="wilayah" value={newData.wilayah || ''} onChange={handleEditChange} placeholder="Enter wilayah" className="mb-2 border p-2 rounded w-full" />
-                    
+                     
                       <label className="block text-sm font-medium text-gray-700">Facilities</label>
                         {newFacilities.map((facility, index) => (
                           <div key={index} className="flex items-center mt-1">
@@ -321,7 +481,7 @@ const WisataTable = ({ navigateToReviewPage}) => {
                               type="text"
                               value={facility}
                               onChange={(e) => handleFacilityChange(index, e.target.value)}
-                              className="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                              className="mb-2 border p-2 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                             />
                             <button
                               type="button"
@@ -335,7 +495,7 @@ const WisataTable = ({ navigateToReviewPage}) => {
                         <button
                           type="button"
                           onClick={addFacility}
-                          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+                          className="mb-5 mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
                         >
                           Add
                         </button>
@@ -345,9 +505,7 @@ const WisataTable = ({ navigateToReviewPage}) => {
                       <input type="text" id="facilities" name="facilities" value={newData.facilities || ''} onChange={handleEditChange} placeholder="Enter facilities" className="mb-2 border p-2 rounded w-full" />
 */}
                       
-                      <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
-                      <input type="text" id="price" name="price" value={newData.price || ''} onChange={handleEditChange} placeholder="Enter price" className="mb-2 border p-2 rounded w-full" />
-                      
+                     
                       <label htmlFor="timeopen" className="block text-sm font-medium text-gray-700">Time Open</label>
                             <div className="grid grid-cols-2 gap-4">
                             <div className="relative">
@@ -384,8 +542,6 @@ const WisataTable = ({ navigateToReviewPage}) => {
                             </div>
                             </div>
                         
-                      <label htmlFor="alamat" className="block text-sm font-medium text-gray-700">Alamat</label>
-                      <input type="text" id="alamat" name="alamat" value={newData.alamat || ''} onChange={handleEditChange} placeholder="Enter alamat" className="mb-2 border p-2 rounded w-full" />
                       
 
                       <label htmlFor="images" className="block text-sm font-medium text-gray-700">Images</label>

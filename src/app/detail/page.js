@@ -16,8 +16,19 @@ import DetailWis1 from "../components/DetailWis1";
 import Footer from "../components/Footer";
 
 
+import useProtectedRoute from "../hooks/useProtectedRoute";
+import useAuth from "../hooks/useAuth";
+
+
+
 export default function Detail(){
- 
+  const loading = useProtectedRoute();
+  useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  
   return (
     <div>
       <Header />

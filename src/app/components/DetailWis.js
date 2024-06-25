@@ -11,13 +11,18 @@ import RatingSummary from "./RatingSummary";
 import { ref, onValue } from 'firebase/database';
 import { rtdb } from '../config/firebase';
 
+import Map from "./Map";
 import ReviewList from "./ReviewList";
+
+
 
 const DetailWis = () => {
   const [place, setPlaceId] = useState('');
 
   const [placeData, setPlaceData] = useState([]);
   const { openingHours } = placeData;
+  
+
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -30,6 +35,10 @@ const DetailWis = () => {
         const data = snapshot.val();
         //console.log('Data Tempat Wisata:', data);
         setPlaceData(data);
+        if (data && data.coordinates) {
+          const { latitude, longitude } = data.coordinates;
+          setCoordinatesString(`${latitude}, ${longitude}`);
+        }
       }, {
         onlyOnce: true // Mengambil data sekali saja
       });
@@ -107,6 +116,12 @@ const DetailWis = () => {
   };
 
   const category = placeData.category || '';
+  // State untuk menyimpan nilai latitude dan longitude yang digabungkan
+//const [currentCoordinates, setCurrentCoordinates] = useState({ latitude: '', longitude: '' });
+
+const [coordinatesString, setCoordinatesString] = useState('');
+
+//const coordinatesString = `${placeData.coordinates.latitude}, ${placeData.coordinates.longitude}`;
 
   return (
     
@@ -199,12 +214,16 @@ const DetailWis = () => {
       <div className="tour_head1 tout-map map-container">
         
         <h3 className="  h-[25px] top-0 left-[35px] [font-family:'Noto_Sans-SemiBold',Helvetica] font-semibold text-[#213d44] text-[22px] tracking-[0] leading-[24.2px] whitespace-nowrap">Location</h3>
+        {coordinatesString && (
+          <Map coordinates={coordinatesString} />
+        )}
+        {/** 
         <iframe
 
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.0010659648477!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fc9ad0a04b51%3A0x6073cc130dca7e9!2sSurabaya%2C%20Surabaya%20City%2C%20East%20Java%2C%20Indonesia!5e0!3m2!1sen!2s!4v1622363310088!5m2!1sen!2s"
           allowFullScreen=""
           className="w-full h-96 border-0"
-        ></iframe>
+        ></iframe>*/}
       </div>
       <button 
       onClick={handleAddReviewClick}

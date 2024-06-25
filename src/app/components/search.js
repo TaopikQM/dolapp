@@ -30,6 +30,8 @@ const SearchResults = () => {
         const activePlaces = places.filter(place => place.status === "ACTIVE");
       
         setData(activePlaces);
+        setOriginalsearchResults(activePlaces); // Simpan data awal ke state originalsearchResults
+
 
         const results = activePlaces.filter((item) => {
           const itemString = JSON.stringify(item).toLowerCase();
@@ -58,11 +60,47 @@ const SearchResults = () => {
     pauseOnHover: true,
   };
 
+  const [activeRegion, setActiveRegion] = useState('Semua'); // State untuk wilayah aktif
+  const [originalsearchResults, setOriginalsearchResults] = useState([]); // State untuk menyimpan data awal
+
+  // Mengambil daftar wilayah unik dari searchResults
+  const regions = [...new Set(searchResults.map(item => item.wilayah))];
+
+  const handleRegionFilter = (region) => {
+    if (region === 'Semua') {
+      setActiveRegion('Semua');
+      setSearchResults(originalsearchResults); // Kembalikan ke data awal tanpa filter
+    } else {
+      setActiveRegion(region === activeRegion ? 'Semua' : region);
+      const filteredByRegion = searchResults.filter(item => item.wilayah === region);
+      setSearchResults(filteredByRegion);
+    }
+  };
+
   return (
     <div className="container mx-auto">
       {searchResults.length > 0 ? (
         <div>
           <h1 className="text-4xl font-bold mb-6 text-center">Hasil Pencarian untuk: {query}</h1>
+
+          {/* Tombol Filter Wilayah */}
+          <div className="flex justify-start space-x-4 mb-4 overflow-x-auto">
+            <button
+              className={`px-4 py-2 rounded-lg ${activeRegion === 'Semua' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+              onClick={() => handleRegionFilter('Semua')}
+            >
+              Semua
+            </button>
+            {regions.map((region, index) => (
+              <button
+                key={index}
+                className={`px-4 py-2 rounded-lg ${activeRegion === region ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+                onClick={() => handleRegionFilter(region)}
+              >
+                {region}
+              </button>
+            ))}
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {searchResults.map((item) => {
               let formattedPrice = null;
