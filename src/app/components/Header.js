@@ -64,13 +64,13 @@ const Header = () => {
             Beranda
           </a>
           <a
-            href="/admin"
+            href="#"
             className={`px-4 py-2 text-[22px] font-normal ${currentPath === '/admin' ? 'bg-blue-600 text-white rounded' : 'hover:bg-blue-600 hover:text-white hover:rounded'}`}
           >
             Promo
           </a>
           <a
-            href="/AddProduct"
+            href="#"
             className={`px-4 py-2 text-[22px] font-normal ${currentPath === '/detail' ? 'bg-blue-600 text-white rounded' : 'hover:bg-blue-600 hover:text-white hover:rounded'}`}
           >
             Event
