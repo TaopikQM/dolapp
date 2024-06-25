@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { ref, get } from 'firebase/database';
-import { rtdb } from '../../config/firebase'; // Sesuaikan path jika berbeda
+import { rtdb } from '../config/firebase'; // Sesuaikan path jika berbeda
 import Link from 'next/link';
 
 const Page = () => {
