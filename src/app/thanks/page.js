@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { ref, get, set } from 'firebase/database';
+import { ref, get, update } from 'firebase/database';
 import { rtdb } from '../config/firebase'; // Sesuaikan path jika berbeda
 import Link from 'next/link';
 
@@ -30,18 +30,18 @@ const Page = () => {
             }
         };
 
-        const saveTransactionStatus = async (orderId, status) => {
+        const updateTransactionStatus = async (orderId, status) => {
             try {
                 const transactionRef = ref(rtdb, `transactions/${orderId}`);
-                await set(transactionRef, { transaction_status: status }, { merge: true });
-                console.log('Transaction status saved:', status);
+                await update(transactionRef, { transaction_status: status });
+                console.log('Transaction status updated:', status);
             } catch (error) {
-                console.error('Error saving transaction status:', error);
+                console.error('Error updating transaction status:', error);
             }
         };
 
         if (orderId && status) {
-            saveTransactionStatus(orderId, status);
+            updateTransactionStatus(orderId, status);
         }
 
         fetchPlaceDetail(placeId);
@@ -81,4 +81,5 @@ const Page = () => {
 };
 
 export default Page;
+
 
