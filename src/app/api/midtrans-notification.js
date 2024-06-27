@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const transactionRef = ref(rtdb, 'transactions/' + notification.order_id);
 
    try {
-      await ref.set({
+      await  set(transactionRef,{
         transaction_time: notification.transaction_time,
         transaction_status: notification.transaction_status,
         transaction_id: notification.transaction_id,
