@@ -14,7 +14,7 @@ const Page = () => {
         const status = searchParams.get('transaction_status');
         setTransactionStatus(status);
 
-        const placeId = orderId.split(',')[0]; // Sesuaikan dengan format order_id Anda
+        const placeId = orderId.split('.')[0]; // Sesuaikan dengan format order_id Anda
 
         const fetchPlaceDetail = async (placeId) => {
             try {
