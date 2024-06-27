@@ -14,7 +14,7 @@ const Page = () => {
         const status = searchParams.get('transaction_status');
         setTransactionStatus(status);
 
-        const placeId = orderId.split('.')[0];
+        const placeId = orderId.split('-')[0]; // Sesuaikan dengan format order_id Anda
 
         const fetchPlaceDetail = async (placeId) => {
             try {
@@ -35,7 +35,7 @@ const Page = () => {
 
     return (
         <div className='flex flex-col justify-center items-center min-h-screen gap-4'>
-            {transactionStatus === 'pending' ? (
+            {transactionStatus === 'pending' && (
                 <>
                     <h3 className='text-center'>Pesanan Anda sedang diproses. Detail pesanan tiket:</h3>
                     {placeDetail && (
@@ -44,9 +44,10 @@ const Page = () => {
                             <p>Nama Tempat: {placeDetail.name}</p>
                         </div>
                     )}
-                    <Link href="http://localhost:3000/" className="text-center">Kembali</Link>
+                    <Link href="http://localhost:3000/"><a className="text-center">Kembali</a></Link>
                 </>
-            ) : transactionStatus === 'settlement' ? (
+            )}
+            {transactionStatus === 'settlement' && (
                 <>
                     <h3 className='text-center'>Terimakasih, transaksi Anda telah berhasil. Detail pesanan tiket:</h3>
                     {placeDetail && (
@@ -55,9 +56,10 @@ const Page = () => {
                             <p>Nama Tempat: {placeDetail.name}</p>
                         </div>
                     )}
-                    <Link href="http://localhost:3000/" className="text-center">Kembali</Link>
+                    <Link href="http://localhost:3000/"><a className="text-center">Kembali</a></Link>
                 </>
-            ) : (
+            )}
+            {transactionStatus !== 'pending' && transactionStatus !== 'settlement' && (
                 <h3 className='text-center'>Status transaksi tidak diketahui.</h3>
             )}
         </div>
@@ -65,4 +67,5 @@ const Page = () => {
 };
 
 export default Page;
+
 
