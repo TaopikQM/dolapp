@@ -2,6 +2,8 @@ import { ref, set } from 'firebase-admin/database';
 import { rtdbAdmin } from '../../admin/firebaseAdmin';
 
 export default async function handler(req, res) {
+  console.log('Request received:', req.method, req.body);
+  
   if (req.method === 'POST') {
     const notification = req.body;
 
@@ -34,12 +36,14 @@ export default async function handler(req, res) {
         va_numbers: notification.va_numbers,
         payment_amounts: notification.payment_amounts,
       });
+      console.log('Notification saved successfully');
       res.status(200).send('Notification saved successfully');
     } catch (error) {
       console.error('Error saving notification:', error);
       res.status(500).send('Internal Server Error');
     }
   } else {
+    console.error('Method Not Allowed');
     res.setHeader('Allow', ['POST']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
