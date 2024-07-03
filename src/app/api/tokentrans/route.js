@@ -75,7 +75,7 @@ export async function POST(request) {
     const { id, placeName, price, quantity, visitDate, userName, userEmail } = await request.json();
 
     // Log incoming request data
-    console.log('Received data:', { id, placeName, price, quantity, visitDate, userName, userEmail });
+    //console.log('Received data:', { id, placeName, price, quantity, visitDate, userName, userEmail });
 
     // Validate the input data
     if (!id || !placeName || !price || !quantity || !visitDate || !userName || !userEmail) {
@@ -104,7 +104,7 @@ export async function POST(request) {
     };
 
     // Log parameters before making transaction
-    console.log('Transaction parameters:', parameter);
+   // console.log('Transaction parameters:', parameter);
 
     // Create transaction with Midtrans
     const transaction = await snap.createTransaction(parameter);
@@ -127,7 +127,7 @@ export async function POST(request) {
     });
   } catch (error) {
     // Handle errors
-    console.error('Transaction creation failed:', error);
+    //console.error('Transaction creation failed:', error);
     return new Response(JSON.stringify({ error: 'Transaction creation failed', details: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
