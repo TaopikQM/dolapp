@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAuth, onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
-const MenuProfil = () => {
+const MenuProfil = ({ handleContentChange , activeContent}) => {
     const [isEditing, setIsEditing] = useState(false); // State untuk mengontrol apakah sedang dalam mode edit atau tidak
     const [newPhotoURL, setNewPhotoURL] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -184,12 +184,31 @@ const MenuProfil = () => {
             <a href="#" className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Resume</a>
           </div>*/}
           <hr className="my-6 border-t border-gray-300" />
-          <div className="flex flex-col gap-2">
-            <button className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Akun</button>
-            <button className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Tiket Aktif</button>
-            <button className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Riwayat Perjalanan</button>
-            <button className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded">Pusat Bantuan</button>
-            <button onClick={handleLogoutClick} className="bg-red-600 text-white px-4 py-2 rounded text-[22px] font-medium">
+          <div className="flex flex-col gap-2 p-4">
+          <button 
+              onClick={() => handleContentChange('akun')} 
+              className={`py-2 px-4 rounded ${activeContent === 'akun' ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-700'}`}
+            >
+              Akun
+            </button>
+            <button 
+              onClick={() => handleContentChange('tiket')} 
+              className={`py-2 px-4 rounded ${activeContent === 'tiket' ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-700'}`}
+            >
+              Tiket Aktif
+            </button>
+            <button 
+              onClick={() => handleContentChange('riwayat')} 
+              className={`py-2 px-4 rounded ${activeContent === 'riwayat' ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-700'}`}
+            >
+              Riwayat Perjalanan
+            </button>
+            <button 
+              onClick={() => handleContentChange('bantuan')} 
+              className={`py-2 px-4 rounded ${activeContent === 'bantuan' ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-700'}`}
+            >
+              Pusat Bantuan
+            </button><button onClick={handleLogoutClick} className="bg-red-600 text-white px-4 py-2 rounded text-[22px] font-medium">
               {isConfirmingLogout ? 'Yakin?' : 'Keluar'}
             </button>
           </div>
