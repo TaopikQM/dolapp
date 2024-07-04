@@ -1,4 +1,5 @@
 // app/admin/page.js
+"use client"; 
 {/*"use client"; // Tambahkan baris ini
 
 import React, { useEffect, useState } from "react";
@@ -68,7 +69,7 @@ const PrifilePage = () => {
 };
 
 export default PrifilePage;*/}
-"use client"; // Tambahkan baris ini
+// Tambahkan baris ini
 
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
