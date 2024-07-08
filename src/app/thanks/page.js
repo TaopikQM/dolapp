@@ -62,7 +62,7 @@ const Page = () => {
                                 </div>
                             )}
                             <Link href="/">
-                                <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring focus:ring-red-300">Kembali</button>
+                                <button className="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 active:bg-orange-700 focus:outline-none focus:ring focus:ring-orange-300">Kembali</button>
                             </Link>
                         </>
                     )}
