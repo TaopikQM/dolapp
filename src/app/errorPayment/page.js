@@ -42,7 +42,7 @@ const ErrorPayment = () => {
                         </div>
                     )}
                     <Link href="/">
-                        <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Kembali</button>
+                        <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">Kembali</button>
                     </Link>
                 </div>
             </div>
