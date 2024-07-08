@@ -62,7 +62,7 @@ const Page = () => {
                                 </div>
                             )}
                             <Link href="/">
-                                <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">Kembali</button>
+                                <button className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring focus:ring-red-300">Kembali</button>
                             </Link>
                         </>
                     )}
@@ -76,7 +76,7 @@ const Page = () => {
                                 </div>
                             )}
                             <Link href="/">
-                                <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">Kembali</button>
+                                <button className="mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 active:bg-green-700 focus:outline-none focus:ring focus:ring-green-300">Kembali</button>
                             </Link>
                         </>
                     )}
@@ -90,7 +90,7 @@ const Page = () => {
                                 </div>
                             )}
                             <Link href="/">
-                                <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">Kembali</button>
+                                <button className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 active:bg-yellow-700 focus:outline-none focus:ring focus:ring-yellow-300">Kembali</button>
                             </Link>
                         </>
                     )}
