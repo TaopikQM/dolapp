@@ -20,7 +20,7 @@ const HelpCenter = () => {
           </div>
         </div>
         <div className="text-center mt-6">
-          <Link href="/more-articles">
+          <Link href="#">
             <a className="text-blue-500 font-medium">Lihat artikel lainnya</a>
           </Link>
         </div>
@@ -37,7 +37,7 @@ const HelpCenter = () => {
           </div>
         </div>
         <div className="text-center mt-6">
-          <Link href="/more-articles">
+          <Link href="#">
             <a className="text-blue-500 font-medium">Lihat artikel lainnya</a>
           </Link>
         </div>
