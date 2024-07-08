@@ -41,7 +41,9 @@ const ErrorPayment = () => {
                             <p>Nama Tempat: {placeDetail.name}</p>
                         </div>
                     )}
-                    <Link href="/" className="underline text-blue-500 mt-4 block text-center">Kembali</Link>
+                    <Link href="/">
+                        <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Kembali</button>
+                    </Link>
                 </div>
             </div>
         </div>
