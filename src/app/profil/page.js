@@ -82,6 +82,7 @@ import { auth } from "../config/firebase";
 import TransactionAktif from '../components/TransactionAktif';
 import TransactionHistoryPage from "../components/transaction-history";
 import Profile from "../components/Profile";
+import HelpCenter from "../components/HelpCenter";
 
 
 
@@ -138,7 +139,7 @@ const ProfilePage = () => {
           {activeContent === 'akun' && <Profile/>}
             {activeContent === 'tiket' && <TransactionAktif/> }
             {activeContent === 'riwayat' && <TransactionHistoryPage />}
-            {activeContent === 'bantuan' && <div>Pusat Bantuan Content</div>}
+            {activeContent === 'bantuan' && <HelpCenter />}
          
             {/*<TransactionHistoryPage/>
             <TransactionsUser userEmail={userEmail} />
