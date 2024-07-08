@@ -49,54 +49,54 @@ const Page = () => {
 
     return (
         <div className="bg-white flex justify-center items-center min-h-screen">
-    <div className="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
-        <div className="flex flex-col items-center">
-            <img src="/img/Logo.png" alt="Dolanrek Logo" className="h-14 mb-6" />
-            {transactionStatus === 'pending' && (
-                <>
-                    <h3 className='text-center'>Pesanan Anda sedang diproses. Detail pesanan tiket:</h3>
-                    {placeDetail && (
-                        <div className='text-center'>
-                            <p>ID Tiket: {placeDetail.id}</p>
-                            <p>Nama Tempat: {placeDetail.name}</p>
-                        </div>
+            <div className="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
+                <div className="flex flex-col items-center">
+                    <img src="/img/Logo.png" alt="Dolanrek Logo" className="h-14 mb-6" />
+                    {transactionStatus === 'pending' && (
+                        <>
+                            <h3 className='text-center'>Pesanan Anda sedang diproses. Detail pesanan tiket:</h3>
+                            {placeDetail && (
+                                <div className='text-center'>
+                                    <p>ID Tiket: {placeDetail.id}</p>
+                                    <p>Nama Tempat: {placeDetail.name}</p>
+                                </div>
+                            )}
+                            <Link href="/">
+                                <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">Kembali</button>
+                            </Link>
+                        </>
                     )}
-                    <Link href="/">
-                        <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Kembali</button>
-                    </Link>
-                </>
-            )}
-            {transactionStatus === 'settlement' && (
-                <>
-                    <h3 className='text-center'>Terimakasih, transaksi Anda telah berhasil. Detail pesanan tiket:</h3>
-                    {placeDetail && (
-                        <div className='text-center'>
-                            <p>ID Tiket: {placeDetail.id}</p>
-                            <p>Nama Tempat: {placeDetail.name}</p>
-                        </div>
+                    {transactionStatus === 'settlement' && (
+                        <>
+                            <h3 className='text-center'>Terimakasih, transaksi Anda telah berhasil. Detail pesanan tiket:</h3>
+                            {placeDetail && (
+                                <div className='text-center'>
+                                    <p>ID Tiket: {placeDetail.id}</p>
+                                    <p>Nama Tempat: {placeDetail.name}</p>
+                                </div>
+                            )}
+                            <Link href="/">
+                                <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">Kembali</button>
+                            </Link>
+                        </>
                     )}
-                    <Link href="/">
-                        <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Kembali</button>
-                    </Link>
-                </>
-            )}
-            {transactionStatus !== 'pending' && transactionStatus !== 'settlement' && (
-                <>
-                    <h3 className="text-lg font-bold text-center">Pesanan tiket Anda gagal. Transaksi kadaluwarsa.</h3>
-                    {placeDetail && (
-                        <div className='text-center'>
-                            <p>ID Tiket: {placeDetail.id}</p>
-                            <p>Nama Tempat: {placeDetail.name}</p>
-                        </div>
+                    {transactionStatus !== 'pending' && transactionStatus !== 'settlement' && (
+                        <>
+                            <h3 className="text-lg font-bold text-center">Pesanan tiket Anda gagal. Transaksi kadaluwarsa.</h3>
+                            {placeDetail && (
+                                <div className='text-center'>
+                                    <p>ID Tiket: {placeDetail.id}</p>
+                                    <p>Nama Tempat: {placeDetail.name}</p>
+                                </div>
+                            )}
+                            <Link href="/">
+                                <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">Kembali</button>
+                            </Link>
+                        </>
                     )}
-                    <Link href="/">
-                        <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Kembali</button>
-                    </Link>
-                </>
-            )}
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
     );
 };
