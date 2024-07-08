@@ -15,11 +15,24 @@ const HelpCenter = () => {
           </div>
           {/* Add more questions in similar blocks as above */}
           <div className="mb-6">
-            <p className="text-lg font-medium">Bagaimana cara memesan tiket di Dolanrek?</p>
+            <p className="text-lg font-medium">Dimana saja Dolanrek bisa diakses?</p>
             <hr className="my-4" />
           </div>
+        </div>
+        <div className="text-center mt-6">
+          <Link href="/more-articles">
+            <a className="text-blue-500 font-medium">Lihat artikel lainnya</a>
+          </Link>
+        </div>
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-4">Pemesanan dan Pembayaran</h2>
           <div className="mb-6">
-            <p className="text-lg font-medium">Apakah ada kebijakan pembatalan tiket?</p>
+            <p className="text-lg font-medium">Apakah bisa memesan tiket wisata melalui Dolanrek?</p>
+            <hr className="my-4" />
+          </div>
+          {/* Add more questions in similar blocks as above */}
+          <div className="mb-6">
+            <p className="text-lg font-medium">Apakah bisa melakukan pembayaran dengan transfer bank?</p>
             <hr className="my-4" />
           </div>
         </div>
