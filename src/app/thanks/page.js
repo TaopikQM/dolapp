@@ -70,7 +70,7 @@ const Page = () => {
                             <p>Nama Tempat: {placeDetail.name}</p>
                         </div>
                     )}
-                    <Link href="http://localhost:3000/"><a className="text-center">Kembali</a></Link>
+                    <Link href="/"><a className="text-center">Kembali</a></Link>
                 </>
             )}
             {transactionStatus !== 'pending' && transactionStatus !== 'settlement' && (
