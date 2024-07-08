@@ -8,7 +8,7 @@ const HelpCenter = () => {
           <h1 className="text-3xl font-bold">FAQ</h1>
         </div>
         <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Informasi Umum</h2>
+          <h2 className="text-xl font-bold mb-4">Informasi Umum</h2>
           <div className="mb-6">
             <p className="text-lg font-medium">Apakah Dolanrek menyediakan informasi wisata seluruh Indonesia?</p>
             <hr className="my-4" />
@@ -25,7 +25,7 @@ const HelpCenter = () => {
           </Link>
         </div>
         <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Pemesanan dan Pembayaran</h2>
+          <h2 className="text-xl font-bold mb-4">Pemesanan dan Pembayaran</h2>
           <div className="mb-6">
             <p className="text-lg font-medium">Apakah bisa memesan tiket wisata melalui Dolanrek?</p>
             <hr className="my-4" />
